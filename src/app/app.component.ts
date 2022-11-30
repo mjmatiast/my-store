@@ -6,5 +6,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'my-store';
+  imgParent = 'https://static.wikia.nocookie.net/dragonball/images/6/64/Final_Yamcha.png';
+  
+  onLoaded(){
+    console.log('log padre')
+  }
 }
+
