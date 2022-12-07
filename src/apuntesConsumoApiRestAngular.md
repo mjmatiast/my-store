@@ -197,19 +197,114 @@ export class ApiService {
 Utilizando la función of importándola desde RxJS, esta función convierte lo que sea que le envíes como parámetro, en un observable.
 
 4
-Implementando slides
+# Implementando slides
+
+Una necesidad crucial cuando se trabaja con Angular es la importación de componentes de terceros para un rápido desarrollo y utilización de los mismos.
+
+Cómo importar componentes de terceros
+Anímate a crear un carrusel de imágenes utilizando librerías como SwiperJS. Luego, instala la dependencia con el comando npm i swiper e impórtala en el módulo principal de tu aplicación para que esté lista para utilizarse.
+```ts
+
+import { SwiperModule } from 'swiper/angular';
+@NgModule({
+  imports: [SwiperModule],
+})
+export class AppModule {}
+```
+Es importante que sepas importar y utilizar este tipo de componentes ya listos para ser utilizados y agilizar así el desarrollo de cualquier aplicación.
+
+API de Prueba
+Existen muchas API gratuitas que puedes utilizar para practicar y construir aplicaciones, te comparto las más populares para que las investigues
+
+MockAPI
+OpenWeather
+Pokémon API
+The Rick and Morty API
+Anímate a explorar estas API y diviértete desarrollando aplicaciones y practicando todo lo que ya sabes sobre Angular hasta aquí. Más adelante en el curso verás cómo potenciar el consumo de API con Angular y sacarle mayor provecho a este framework.
 
 5
-Solicitudes POST
+# Solicitudes POST
+Llega el momento de crear registros a través de una API y para esto, siempre se utiliza el verbo HTTP POST.
+
+Tipado de Peticiones HTTP
+Descubre a continuación cómo utilizar el cliente HTTP de angular para tipar tu solicitiud GET y crear un producto.
+
+1. Crea interfaces para tipar el producto y su categoría
+Siempre es aconsejable tipar los datos y evitar el uso del tipo any, ya que aumenta la posibilidad de errores en tu aplicación. Para esto, creamos varias interfaces para tipar el Producto y la Categoría del producto:
+```ts
+// interfaces producto.interface.ts
+export interface Category {
+  idCategory: string;
+  category: string;
+}
+export interface Product {
+  id: number;
+  name: string;
+  precio: number;
+  description: string;
+  image: string;
+  category: Category;
+}
+```
+Observa que la interfaz de Producto tiene un ID y una Category. Normalmente, una petición POST no recibe una ID ni tampoco un objeto del tipo category. El ID es autogenerable en la base de datos y la categoría suele recibirse solo el identificador de la misma.
+
+2. Genera otra interfaz Producto
+Para solucionar esto, puedes crear otra interfaz y gracias a características propias de TypeScript, puedes extender el uso de la interfaz Producto y omitir los campos que no sirven para una petición POST.
+```ts
+// interfaces producto.interface.ts
+export interface CreateProducto extends Omit<Product, 'id' | 'category'> {
+  idCategory: string;
+}
+3. Logra tipar por completo tu solicitud POST
+Ahora es posible tipar por completo tu solicitud POST. Tanto los datos que envías en el body de la petición como los datos que recibirás en la respuesta.
+
+// services/api.service.ts
+import { CreateProducto } from '../interfaces/producto.interface';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ApiService {
+
+  constructor(
+    private http: HttpClient,
+  ) { }
+
+  createProduct(body: CreateProducto): Observable<Producto> {
+    return this.http.post<Producto>(`https://example.com/api/productos`, body);
+  }
+}
+
+```
+4. Importa los servicios e interfaces
+Desde tu componente puedes importar el servicio, las interfaces que necesites y podrás crear los objetos y realizar la petición POST para crear el Producto.
+```ts
+// components/catalogo/catalogo.component.ts
+createProduct(): void {
+  const body: CreateProducto = {
+    name: 'Nuevo producto',
+    precio: 100,
+    description: 'Descripción del producto',
+    image: 'https://example.com/image',
+    idCategory: '1'
+  };
+  this.apiService.createProduct(body)
+    .subscribe((p: Product) => {
+        // Guardamos el nuevo producto, en el Array de productos junto con los otros.
+        this.productos.push(p);
+    });
+}
+```
+Este tipo de endpoints suele recibir un body con los datos que necesita el registro para construirse. En caso de éxito, el mismo tiene que devolver el objeto recientemente insertado en la base de datos para actualizar inmediatamente el front-end.
 
 6
-Solicitudes PUT y PATCH
+# Solicitudes PUT y PATCH
 
 7
-Solicitudes DELETE
+# Solicitudes DELETE
 
 8
-Url Parameters / Paginación
+# Url Parameters / Paginación
 
 9
 Observable vs. Promesa
